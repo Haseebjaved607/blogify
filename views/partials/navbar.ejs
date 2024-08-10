@@ -17,25 +17,35 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
+        <% if (locals.user) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Aldd Blog</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Hasii Mughal
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="/user/logout">logout</a></li>
+            </ul>
+          </li>
+        </ul>
+  
+        <% } else{%>
         <li class="nav-item">
-          <a class="nav-link" href="#">Aldd Blog</a>
+          <a class="nav-link" href="/user/signup">Create Account</a>
         </li>
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="navbarDropdown"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Hasii Mughal
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">logout</a></li>
-          </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="/user/signin">Signin</a>
         </li>
-       
+        <% } %>
       </ul>
       <form class="d-flex">
         <input
@@ -49,3 +59,10 @@
     </div>
   </div>
 </nav>
+
+<% if (locals.error) { %>
+<div class="container mt-4">
+  <div class="alert alert-danger" role="alert"><%= locals.error %></div>
+</div>
+
+<% } %>

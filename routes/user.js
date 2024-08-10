@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import User from '../model/user.js';
+import { createTokenForUser } from '../services/auth.js';
 
 const router = Router();
 
@@ -10,6 +11,10 @@ router.get('/signin', (req, res) => {
 router.get('/signup', (req, res) => {
     res.render('signup'); // renders signup.ejs
 });
+
+router.get("/logout", (req , res )=>{
+    res.clearCookie("token").redirect("/home")
+})
 
 router.post('/signup', async (req, res, next) => {
     try {
@@ -22,14 +27,22 @@ router.post('/signup', async (req, res, next) => {
 });
 
 router.post('/signin', async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.matchpassword(email, password);
-        // console.log("User", user);
 
-        res.redirect('/home'); // redirect to /home upon successful signin
+    const { email, password } = req.body;
+    try {
+
+        if (!email || !password) {
+            return res.status(400).send("Email and password are required");
+        }
+
+        const token = await User.matchpasswordAndgenerateToken(email, password);
+
+        return res.cookie("token", token).redirect('/home'); // redirect to /home upon successful signin
     } catch (error) {
-        next(error); // pass error to next middleware
+        return res.render("signin", {
+            error: "Invalid email or password"
+        })
+
     }
 });
 
