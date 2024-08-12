@@ -1,6 +1,6 @@
 import { createHmac, randomBytes } from "crypto";
 import { Schema, model } from "mongoose";
-import { createTokenForUser, validateToken } from "../services/auth.js"
+import { createTokenForUser } from "../services/auth.js";
 
 const userSchema = new Schema({
     fullName: {
@@ -14,7 +14,6 @@ const userSchema = new Schema({
     },
     salt: {
         type: String,
-
     },
     password: {
         type: String,
@@ -28,9 +27,8 @@ const userSchema = new Schema({
         type: String,
         enum: ["USER", "ADMIN"],
         default: "USER"
-    },
-
-}, { timestamps: true })
+    }
+}, { timestamps: true });
 
 userSchema.pre("save", function (next) {
     const user = this;
@@ -41,27 +39,24 @@ userSchema.pre("save", function (next) {
     this.salt = salt;
     this.password = hashedPassword;
 
-    next()
-})
+    next();
+});
 
-userSchema.static('matchpasswordAndgenerateToken', async function (email, password) {
+userSchema.statics.matchPasswordAndGenerateToken = async function (email, password) {
     const user = await this.findOne({ email });
-    if (!user) throw new Error("user not found");
-    const salt = user.salt
-    const hashedPassword = user.password
+    if (!user) throw new Error("User not found");
+    const salt = user.salt;
+    const hashedPassword = user.password;
 
-    const userprovidedHash = createHmac('sha256', salt)
+    const userProvidedHash = createHmac('sha256', salt)
         .update(password)
         .digest('hex');
 
-    if (hashedPassword !== userprovidedHash)
-        throw new Error("Invalid Password")
-    // return { ...user, password: undefined, salt: undefined }
-    const token = createTokenForUser(user)
+    if (hashedPassword !== userProvidedHash) throw new Error("Invalid Password");
+    
+    const token = createTokenForUser(user);
     return token;
+};
 
-})
-
-const User = model('User', userSchema)
-
-export default User;  // make it available to other parts of the application. 
+const User = model('User', userSchema);
+export default User;
