@@ -25,13 +25,14 @@ app.use(cookieParser());
 app.use(checkForAuthenticationCookie('token'));
 app.use(express.static(path.resolve('./public')));
 
+
 // Routes
 app.get("/", async (req, res) => {
     try {
         const allBlogs = await Blog.find({});
         res.render('home', {
             user: req.user,
-            blogs: allBlogs
+            blogs: allBlogs // This should pass an array of blogs to the template
         });
     } catch (error) {
         console.error(error);
@@ -39,11 +40,14 @@ app.get("/", async (req, res) => {
     }
 });
 
-app.get("/home", (req, res) => {
+
+app.get("/", (req, res) => {
     res.render('home', {
         user: req.user
     });
 });
+
+
 
 app.use("/user", router);
 app.use("/blog", blogRouter);
